@@ -1,0 +1,217 @@
+/* ============================================================
+   Engineer's Desk — 全局样式
+   与 restyle-submodule skill 保持一致的视觉系统
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* —— 颜色 —— */
+  --bg: #f4f1ea;              /* 米黄纸张底 */
+  --bg-card: #ffffff;          /* 卡片白 */
+  --bg-side: #ebe6d7;          /* 侧边栏深米 */
+  --bg-code: #1e2230;          /* 代码块（深色） */
+  --text: #1c1b1a;             /* 墨黑 */
+  --text-2: #4a4845;           /* 副墨色 */
+  --text-3: #8b8678;           /* 灰墨 */
+  --border: #d9d3c4;           /* 笔记格线 */
+  --primary: #a8321e;          /* 朱砂红 */
+  --primary-2: #c25640;
+  --primary-soft: #f5e3dc;
+  --green: #2e7d5b;
+  --yellow: #b8862e;
+  --tag-bg: #f5e3dc;
+  --tag-color: #a8321e;
+
+  /* —— 阴影 / 圆角 —— */
+  --shadow: 0 1px 3px rgba(28, 27, 26, 0.05);
+  --shadow-hover: 0 8px 24px rgba(28, 27, 26, 0.08);
+  --radius: 6px;
+  --radius-sm: 4px;
+
+  /* —— 字体 —— */
+  --font-code: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  --font-display: 'Fraunces', 'Source Han Serif SC', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+  --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  /* —— 尺寸 —— */
+  --side-w: 280px;
+  --right-w: 260px;
+  --top-h: 60px;
+  color-scheme: light;
+}
+
+/* —— 黑夜主题：GitHub Dark Dimmed 风格 ——
+   触发条件：<html data-theme="dark">
+   所有组件都走 CSS 变量，这里覆盖一次即可全站切换 */
+:root[data-theme='dark'] {
+  --bg: #1a1d21;              /* 主底：深蓝灰，比纯黑柔 */
+  --bg-card: #22262b;         /* 卡片：比底略亮 */
+  --bg-side: #16191c;         /* 侧边栏：比底深一档 */
+  --bg-code: #0d1117;         /* 代码块：更深 */
+  --text: #d1d5da;            /* 主字：柔白，不刺眼 */
+  --text-2: #9ba0a6;          /* 副字 */
+  --text-3: #6a7077;          /* 灰字 */
+  --border: #30363d;          /* GitHub 标准边线色 */
+  --primary: #f08e6f;         /* 暖橙红，替代朱砂 */
+  --primary-2: #f7a98e;
+  --primary-soft: #3a2a25;    /* 橙红底 */
+  --green: #6cb395;
+  --yellow: #d4a847;
+  --tag-bg: #3a2a25;
+  --tag-color: #f7a98e;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 144;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  margin: 1.4em 0 0.6em;
+}
+h1 { font-size: 1.8rem; }
+h2 { font-size: 1.35rem; }
+h3 { font-size: 1.1rem; }
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+code, pre {
+  font-family: var(--font-code);
+  font-size: 0.88em;
+}
+p code, li code {
+  background: var(--primary-soft);
+  color: var(--primary);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+pre {
+  background: var(--bg-code);
+  color: #e6e1d7;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  line-height: 1.55;
+}
+pre code { background: transparent; color: inherit; padding: 0; }
+
+blockquote {
+  margin: 1em 0;
+  padding: 10px 16px;
+  border-left: 3px solid var(--primary);
+  background: var(--primary-soft);
+  color: var(--text-2);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 0.92em;
+}
+th, td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+th {
+  background: var(--bg-side);
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text);
+}
+ul, ol { padding-left: 1.4em; }
+li { margin: 0.25em 0; }
+
+hr {
+  border: none;
+  border-top: 1px dashed var(--border);
+  margin: 2em 0;
+}
+
+/* —— 滚动条 —— */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* —— 焦点 —— */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* —— 通用按钮 —— */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: var(--shadow);
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.btn-primary:hover {
+  background: var(--primary-2);
+  color: #fff;
+  border-color: var(--primary-2);
+}
+.btn-ghost {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-2);
+}
+.btn-ghost:hover { color: var(--primary); border-color: var(--primary); }
+
+.tag {
+  display: inline-block;
+  padding: 2px 9px;
+  font-size: 11.5px;
+  font-family: var(--font-code);
+  letter-spacing: 0.4px;
+  background: var(--tag-bg);
+  color: var(--tag-color);
+  border-radius: var(--radius-sm);
+  margin-right: 4px;
+}
