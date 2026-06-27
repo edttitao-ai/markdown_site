@@ -4,9 +4,11 @@ import './Outline.css';
 
 interface Props {
   items: OutlineItem[];
+  isMobile?: boolean;
+  onItemClick?: () => void;
 }
 
-export default function Outline({ items }: Props) {
+export default function Outline({ items, isMobile, onItemClick }: Props) {
   const [activeId, setActiveId] = useState<string>('');
   const tickingRef = useRef(false);
 
@@ -117,7 +119,7 @@ export default function Outline({ items }: Props) {
 
   if (h1Items.length === 0) {
     return (
-      <aside className="outline empty">
+      <aside className={'outline empty' + (isMobile ? ' mobile' : '')}>
         <div className="outline-eyebrow">OUTLINE</div>
         <div className="outline-empty-hint">正文无标题</div>
       </aside>
@@ -125,9 +127,15 @@ export default function Outline({ items }: Props) {
   }
 
   return (
-    <aside className="outline">
-      <div className="outline-eyebrow">ON THIS PAGE</div>
-      <h4 className="outline-title">大纲</h4>
+    <aside className={'outline' + (isMobile ? ' mobile' : '')}>
+      {isMobile && (
+        <div className="outline-mobile-head">
+          <div className="outline-eyebrow">ON THIS PAGE</div>
+          <h4 className="outline-title">大纲</h4>
+        </div>
+      )}
+      {!isMobile && <div className="outline-eyebrow">ON THIS PAGE</div>}
+      {!isMobile && <h4 className="outline-title">大纲</h4>}
       <ul className="outline-list">
         {h1Items.map((it) => (
           <li
@@ -137,7 +145,10 @@ export default function Outline({ items }: Props) {
             <a
               href={'#' + it.id}
               className="outline-link"
-              onClick={(e) => handleJump(e, it.id)}
+              onClick={(e) => {
+                handleJump(e, it.id);
+                onItemClick?.();
+              }}
             >
               {it.text}
             </a>

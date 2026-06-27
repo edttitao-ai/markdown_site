@@ -202,16 +202,111 @@
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
-/* 折叠态：符号翻向另一侧 */
+/* 折叠态:符号翻向另一侧 */
 .app-sidebar-toggle.collapsed {
   transform: rotate(180deg);
 }
 .app-sidebar-toggle.collapsed:hover {
   transform: rotate(180deg) scale(1.05);
 }
+/* 移动端:打开抽屉时按钮高亮 */
+.app-sidebar-toggle.open {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
 
 @media (prefers-reduced-motion: reduce) {
   .app-sidebar-toggle {
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ============================================================
+   移动端适配 (< 768px)
+   - 三栏 → 单栏 + 抽屉
+   - 顶栏保留 + 汉堡按钮
+   - 字号/padding 缩小
+   ============================================================ */
+.app-drawer-mask {
+  position: fixed;
+  inset: var(--top-h) 0 0 0;
+  background: rgba(28, 27, 26, 0.5);
+  z-index: 40;
+  animation: app-mask-in 220ms ease-out;
+}
+:root[data-theme='dark'] .app-drawer-mask {
+  background: rgba(0, 0, 0, 0.6);
+}
+@keyframes app-mask-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-drawer-mask { animation: none; }
+}
+
+@media (max-width: 768px) {
+  /* 顶栏:压缩 padding、隐藏副标题 */
+  .app-top {
+    height: 52px;
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .app-top-left {
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+  }
+  .app-sidebar-toggle {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+  }
+  .app-logo {
+    width: 26px;
+    height: 26px;
+  }
+  .app-logo svg { width: 20px; height: 20px; }
+  .app-title-block {
+    min-width: 0;
+    overflow: hidden;
+  }
+  .app-title {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .app-subtitle { display: none; }
+  .app-top-right {
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .app-status {
+    font-size: 10.5px;
+    padding: 3px 7px;
+    /* 太长截断 */
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* 抽屉打开时给正文内容加右移,避免被遮罩吞掉 */
+  .app-body {
+    position: relative;
+  }
+  /* Welcome 页适配 */
+  .welcome {
+    padding: 28px 20px 40px;
+  }
+  .welcome-title { font-size: 28px; }
+  .welcome-desc { font-size: 14px; margin-bottom: 24px; }
+  .welcome-grid { gap: 12px; }
+  .welcome-card { padding: 18px 18px 20px; }
+  .welcome-card h3 { font-size: 17px; }
+  .welcome-card p { font-size: 12.5px; }
+  /* 极窄屏 (< 380px) 进一步压缩 */
+  .app-top { padding: 0 10px; }
+  .app-title { font-size: 13px; }
 }

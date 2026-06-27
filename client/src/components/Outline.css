@@ -90,3 +90,45 @@
   outline-offset: 1px;
   border-radius: 2px;
 }
+
+/* ============================================================
+   移动端 (< 768px) — Outline 改为右滑抽屉
+   ============================================================ */
+@media (max-width: 768px) {
+  .outline {
+    position: fixed;
+    top: 52px;
+    right: 0;
+    bottom: 0;
+    width: 86vw;
+    max-width: 320px;
+    z-index: 50;
+    border-left: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(28, 27, 26, 0.18);
+    padding: 18px 18px 24px;
+    animation: outline-drawer-in 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .outline-mobile-head {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .outline-mobile-head .outline-title { margin-bottom: 0; }
+  .outline.empty { padding: 18px; }
+  .outline-link {
+    padding: 10px 12px;
+    font-size: 14px;
+    /* 手指触达 */
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .outline-item.level-1 .outline-link { font-size: 14.5px; }
+}
+@keyframes outline-drawer-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .outline { animation: none; }
+}

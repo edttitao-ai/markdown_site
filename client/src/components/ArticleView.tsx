@@ -7,11 +7,24 @@ import './ArticleView.css';
 interface Props {
   category: string;
   id: string;
+  isMobile: boolean;
+  outlineOpen: boolean;
+  onToggleOutline: () => void;
+  onCloseOutline: () => void;
   onEdit: () => void;
   onDeleted: () => void;
 }
 
-export default function ArticleView({ category, id, onEdit, onDeleted }: Props) {
+export default function ArticleView({
+  category,
+  id,
+  isMobile,
+  outlineOpen,
+  onToggleOutline,
+  onCloseOutline,
+  onEdit,
+  onDeleted,
+}: Props) {
   const [data, setData] = useState<ArticleFull | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [outline, setOutline] = useState<ReturnType<typeof extractOutline>>([]);
@@ -26,7 +39,7 @@ export default function ArticleView({ category, id, onEdit, onDeleted }: Props) 
         const r = await getArticle(category, id);
         if (!alive) return;
         setData(r);
-        // 从 HTML 反推 outline 不准；从 raw 拉一份
+        // 从 HTML 反推 outline 不准;从 raw 拉一份
         const raw = await fetch(`/api/raw?category=${encodeURIComponent(category)}&id=${encodeURIComponent(id)}`).then((x) =>
           x.ok ? x.json() : null,
         );
@@ -67,6 +80,16 @@ export default function ArticleView({ category, id, onEdit, onDeleted }: Props) 
             </span>
           </div>
           <div className="art-actions">
+            {isMobile && outline.length > 0 && (
+              <button
+                className="btn art-outline-toggle"
+                onClick={onToggleOutline}
+                aria-label={outlineOpen ? '关闭大纲' : '打开大纲'}
+                aria-expanded={outlineOpen}
+              >
+                ☰ 大纲
+              </button>
+            )}
             <button className="btn" onClick={onEdit}>
               ✎ 编辑
             </button>
@@ -84,7 +107,14 @@ export default function ArticleView({ category, id, onEdit, onDeleted }: Props) 
         </footer>
       </main>
 
-      <Outline items={outline} />
+      {/* 桌面端始终显示 Outline;移动端按 outlineOpen 抽屉式显示 */}
+      {(isMobile ? outlineOpen : true) && (
+        <Outline
+          items={outline}
+          isMobile={isMobile}
+          onItemClick={isMobile ? onCloseOutline : undefined}
+        />
+      )}
     </div>
   );
 }

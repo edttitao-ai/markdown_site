@@ -6,11 +6,12 @@ import './Editor.css';
 interface Props {
   initialCategory?: string;
   initialId?: string;
+  isMobile?: boolean;
   onSaved: (category: string, id: string) => void;
   onCancel: () => void;
 }
 
-export default function Editor({ initialCategory, initialId, onSaved, onCancel }: Props) {
+export default function Editor({ initialCategory, initialId, isMobile, onSaved, onCancel }: Props) {
   const [categories, setCategories] = useState<string[]>([]);
   const [category, setCategory] = useState(initialCategory || '');
   const [newCategory, setNewCategory] = useState('');
@@ -21,6 +22,8 @@ export default function Editor({ initialCategory, initialId, onSaved, onCancel }
   const [originalId, setOriginalId] = useState<string | undefined>(initialId);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  // 移动端 Tab 切换:'edit' | 'preview',默认 'edit'
+  const [mobilePane, setMobilePane] = useState<'edit' | 'preview'>('edit');
 
   useEffect(() => {
     (async () => {
@@ -182,7 +185,12 @@ export default function Editor({ initialCategory, initialId, onSaved, onCancel }
       {err && <div className="editor-error">⚠ {err}</div>}
 
       <div className="editor-split">
-        <div className="editor-pane editor-pane-input">
+        <div
+          className={
+            'editor-pane editor-pane-input' +
+            (isMobile ? (mobilePane === 'edit' ? ' mobile-active' : ' mobile-hidden') : '')
+          }
+        >
           <div className="editor-pane-head">
             <span className="editor-pane-label">MARKDOWN</span>
             <span className="editor-pane-stat">{body.length} 字</span>
@@ -191,22 +199,53 @@ export default function Editor({ initialCategory, initialId, onSaved, onCancel }
             className="editor-textarea"
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            placeholder={'# 一句话核心结论\n\n**关键概念**：...\n\n## 详细对比\n\n- 要点 1\n- 要点 2\n\n```js\n// 示例代码\n```\n'}
+            placeholder={'# 一句话核心结论\n\n**关键概念**:...\n\n## 详细对比\n\n- 要点 1\n- 要点 2\n\n```js\n// 示例代码\n```\n'}
             spellCheck={false}
           />
         </div>
 
-        <div className="editor-pane editor-pane-preview">
-          <div className="editor-pane-head">
-            <span className="editor-pane-label">PREVIEW</span>
-            <span className="editor-pane-stat">实时预览</span>
+        <div
+          className={
+            'editor-pane editor-pane-preview-wrap' +
+            (isMobile ? (mobilePane === 'preview' ? ' mobile-active' : ' mobile-hidden') : '')
+          }
+        >
+          <div className="editor-pane editor-pane-preview">
+            <div className="editor-pane-head">
+              <span className="editor-pane-label">PREVIEW</span>
+              <span className="editor-pane-stat">实时预览</span>
+            </div>
+            <div
+              className="editor-preview art-body"
+              dangerouslySetInnerHTML={{ __html: html || '<p class="editor-preview-empty">(左侧输入内容后会实时渲染)</p>' }}
+            />
           </div>
-          <div
-            className="editor-preview art-body"
-            dangerouslySetInnerHTML={{ __html: html || '<p class="editor-preview-empty">（左侧输入内容后会实时渲染）</p>' }}
-          />
         </div>
       </div>
+
+      {/* 移动端底部 Tab 切换:编辑 / 预览 */}
+      {isMobile && (
+        <div className="editor-mobile-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobilePane === 'edit'}
+            className={'editor-mobile-tab' + (mobilePane === 'edit' ? ' active' : '')}
+            onClick={() => setMobilePane('edit')}
+          >
+            ✎ 编辑
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobilePane === 'preview'}
+            className={'editor-mobile-tab' + (mobilePane === 'preview' ? ' active' : '')}
+            onClick={() => setMobilePane('preview')}
+          >
+            👁 预览
+          </button>
+        </div>
+      )}
     </div>
   );
 }

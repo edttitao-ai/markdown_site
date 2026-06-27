@@ -175,3 +175,101 @@
     max-height: 45%;
   }
 }
+
+/* ============================================================
+   移动端 (< 768px) — 编辑器全屏
+   ============================================================ */
+@media (max-width: 768px) {
+  .editor-topbar {
+    padding: 10px 12px;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .editor-topbar .btn {
+    min-height: 38px;
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  .editor-title {
+    font-size: 14.5px;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .editor-form {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .editor-input { font-size: 14px; min-height: 40px; }
+  .editor-title-input { font-size: 15px; }
+  .editor-cat-row .btn { min-height: 40px; }
+  .editor-error { margin: 8px 14px 0; font-size: 12.5px; }
+  /* 分屏:全屏切换而非堆叠 */
+  .editor-split {
+    flex: 1;
+    flex-direction: column;
+  }
+  .editor-pane-input,
+  .editor-pane-preview-wrap {
+    flex: 1 1 100%;
+    max-height: 100%;
+  }
+  .editor-pane-input { border-bottom: none; }
+  .editor-pane.mobile-hidden,
+  .editor-pane-preview-wrap.mobile-hidden {
+    display: none;
+  }
+  .editor-pane.mobile-active,
+  .editor-pane-preview-wrap.mobile-active {
+    display: flex;
+  }
+  .editor-textarea {
+    padding: 14px 16px;
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .editor-preview {
+    padding: 18px 16px 40px;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+  /* 底部 Tab 栏 */
+  .editor-mobile-tabs {
+    display: flex;
+    flex-shrink: 0;
+    border-top: 1px solid var(--border);
+    background: var(--bg-card);
+    padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px));
+    gap: 8px;
+  }
+  .editor-mobile-tab {
+    flex: 1;
+    min-height: 44px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-2);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .editor-mobile-tab.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .editor-mobile-tab:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+/* 非移动端隐藏 Tab 栏 */
+@media (min-width: 769px) {
+  .editor-mobile-tabs { display: none; }
+}

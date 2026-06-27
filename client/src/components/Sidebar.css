@@ -333,3 +333,62 @@
     opacity: 1 !important;
   }
 }
+
+/* ============================================================
+   移动端 (< 768px) — Sidebar 改为左滑抽屉
+   桌面端折叠逻辑保留;移动端用 position: fixed + translateX
+   ============================================================ */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 52px;
+    bottom: 0;
+    left: 0;
+    width: 86vw;
+    max-width: 340px;
+    z-index: 50;
+    border-right: 1px solid var(--border);
+    transform: translateX(-100%);
+    transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 24px rgba(28, 27, 26, 0.18);
+  }
+  .sidebar.collapsed {
+    /* 移动端 .collapsed 表示"抽屉关",所以走 translateX(-100%) */
+    width: 86vw;
+    max-width: 340px;
+    transform: translateX(-100%);
+    border-right-color: var(--border);
+  }
+  .sidebar:not(.collapsed) {
+    transform: translateX(0);
+  }
+  .sidebar-inner {
+    width: 100%;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* 移动端不使用朱砂指示线和浮动展开按钮 */
+  .sidebar-rail,
+  .sidebar-expand-btn {
+    display: none;
+  }
+  /* 树项 padding 增大,提高手指触达 */
+  .tree-cat-head {
+    padding: 10px 16px;
+    min-height: 44px;
+  }
+  .tree-item {
+    padding: 10px 12px;
+    min-height: 44px;
+    font-size: 14px;
+  }
+  .tree-folder { font-size: 14px; }
+  .tree-file-icon { font-size: 14px; }
+  .side-head { padding: 18px 18px 14px; }
+  .side-title { font-size: 19px; }
+  .side-new {
+    min-height: 44px;
+    font-size: 14.5px;
+  }
+}
