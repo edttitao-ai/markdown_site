@@ -33,36 +33,38 @@ export default function Sidebar({
         const list = await getCategories();
         if (!alive) return;
         setCats(list);
-        // 默认展开所有
-        setExpanded(new Set(list.map((c) => c.name)));
+        // 默认全部折叠，用户点击时展开
+        setExpanded(new Set());
       } catch (e: any) {
         setErr(e.message);
       }
     })();
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, [refreshKey]);
 
   useEffect(() => {
     let alive = true;
     (async () => {
-      // 只加载展开中的分类
       for (const cat of cats) {
         if (!expanded.has(cat.name)) continue;
         try {
           const arts = await getArticles(cat.name);
           if (!alive) return;
           setArticlesByCat((prev) => new Map(prev).set(cat.name, arts));
-        } catch {
-          /* ignore */
-        }
+        } catch { /* ignore */ }
       }
     })();
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, [cats, expanded, refreshKey]);
+
+  // 选中文章时，自动展开对应分类
+  useEffect(() => {
+    if (!selectedCategory) return;
+    setExpanded((prev) => {
+      if (prev.has(selectedCategory)) return prev;
+      return new Set([...prev, selectedCategory]);
+    });
+  }, [selectedCategory]);
 
   function toggle(cat: string) {
     setExpanded((prev) => {
@@ -75,7 +77,6 @@ export default function Sidebar({
 
   return (
     <aside className={'sidebar' + (collapsed ? ' collapsed' : '')}>
-      {/* 收起来时：朱砂指示线 + 浮动展开按钮 */}
       <div className="sidebar-rail" aria-hidden />
       <button
         type="button"
@@ -83,9 +84,7 @@ export default function Sidebar({
         onClick={onToggle}
         aria-label="展开侧边栏"
         title="展开侧边栏 (Ctrl+B)"
-      >
-        ›
-      </button>
+      >›</button>
 
       <div className="sidebar-inner">
         <div className="side-head">
@@ -94,9 +93,7 @@ export default function Sidebar({
           <p className="side-desc">
             {cats.reduce((s, c) => s + c.count, 0)} 篇 · {cats.length} 个分类
           </p>
-          <button className="btn btn-primary side-new" onClick={onNew}>
-            + 新建文档
-          </button>
+          <button className="btn btn-primary side-new" onClick={onNew}>+ 新建文档</button>
         </div>
 
         {err && <div className="side-error">⚠ {err}</div>}
@@ -113,9 +110,7 @@ export default function Sidebar({
                   <span
                     className="tree-caret"
                     style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}
-                  >
-                    ▾
-                  </span>
+                  >▾</span>
                   <span className="tree-folder">📁</span>
                   <span className="tree-cat-name">{cat.name}</span>
                   <span className="tree-cat-count">{cat.count}</span>
@@ -131,9 +126,7 @@ export default function Sidebar({
                       onClick={() => onSelect(cat.name, a.id)}
                     >
                       <span className="tree-file-icon">📄</span>
-                      <span className="tree-item-title" title={a.title}>
-                        {a.title}
-                      </span>
+                      <span className="tree-item-title" title={a.title}>{a.title}</span>
                     </li>
                   ))}
                 </ul>
