@@ -9,7 +9,9 @@ import fsSync from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
-import { marked } from 'marked';
+import { Marked } from 'marked';
+import { markedHighlight } from 'marked-highlight';
+import hljs from 'highlight.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -27,16 +29,17 @@ function safeId(input) {
   return s || `untitled-${Date.now()}`;
 }
 
-// 与 client/src/lib/markdown.ts 共用的 slug 规则：
-// 把非 字母/数字/空白/-/_ 去掉再小写化,把空白合为 -
-function makeHeadingId(text, slugCount) {
+// slugCount 用于 heading id 去重
+const slugCount = new Map();
+
+function makeHeadingId(text, counter) {
   const base = text
     .trim()
     .toLowerCase()
     .replace(/[^\p{L}\p{N}\s\-_]/gu, '')
     .replace(/\s+/g, '-');
-  const n = slugCount.get(base) || 0;
-  slugCount.set(base, n + 1);
+  const n = counter.get(base) || 0;
+  counter.set(base, n + 1);
   return n === 0 ? base : base + '-' + n;
 }
 
@@ -48,20 +51,30 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-// 给 marked 装一个和客户端完全一致的 heading renderer,这样正文里的 h1/h2/h3 都会带上 id,
-// 客户端的 extractOutline 算出来的 id 才能在 DOM 里找到。
-const slugCount = new Map();
-const serverRenderer = new marked.Renderer();
-serverRenderer.heading = function (token) {
-  const id = makeHeadingId(token.text, slugCount);
-  return (
-    '<h' + token.depth + ' id="' + escapeHtml(id) + '">' + token.text + '</h' + token.depth + '>'
-  );
-};
+// marked v15 + highlight.js 代码高亮
+const markedInstance = new Marked(
+  markedHighlight({
+    langPrefix: 'hljs language-',
+    highlight(code, lang) {
+      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+      return hljs.highlight(code, { language }).value;
+    },
+  }),
+);
+
+// 自定义 heading renderer：给 h1/h2/h3 注入 id，供客户端大纲联动
+markedInstance.use({
+  renderer: {
+    heading({ text, depth }) {
+      const id = makeHeadingId(text, slugCount);
+      return `<h${depth} id="${escapeHtml(id)}">${text}</h${depth}>\n`;
+    },
+  },
+});
 
 function renderArticleHtml(md, category) {
   slugCount.clear();
-  const html = marked.parse(md, { renderer: serverRenderer, gfm: true, breaks: false });
+  const html = markedInstance.parse(md);
   // 重写 <img src="相对路径"> 为 <img src="/articles/{category}/相对路径">
   // 原因：marked 原样输出 <img>，相对路径是相对于 .md 文件的，但浏览器把它解析为
   // 相对于当前 URL（http://localhost:5173/...），导致 404。改成绝对路径后由后端静态服务接管
@@ -312,7 +325,6 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// ---------- listen ----------
 app.listen(PORT, () => {
   console.log(`[server] mianshiti API listening on http://localhost:${PORT}`);
   console.log(`[server] articles dir: ${ARTICLES_DIR}`);

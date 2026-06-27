@@ -150,6 +150,29 @@
 }
 
 /* ============================================================
+   代码高亮 — highlight.js github.css
+   hljs 输出: <pre><code class="hljs language-xxx">...</code></pre>
+   ============================================================ */
+.art-body pre {
+  padding: 16px 18px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  font-size: 0.83em;
+  line-height: 1.65;
+}
+.art-body :is(pre, pre *) {
+  font-family: var(--font-code) !important;
+}
+.art-body code.hljs {
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 1em;
+  color: inherit;
+}
+
+/* ============================================================
    移动端 (< 768px) — 文章阅读
    ============================================================ */
 @media (max-width: 768px) {
@@ -173,10 +196,10 @@
   .art-body h3 { font-size: 1.05rem; }
   /* 表格/代码块:横向滚动避免撑破布局 */
   .art-body pre {
+    /* 移动端 padding 稍小，其余沿用全局规则 */
     padding: 12px 14px;
-    font-size: 0.82em;
-    /* 强制单行滚动条,不挤压外层 */
-    max-width: 100%;
+    font-size: 0.8em;
+    overflow-x: auto;
   }
   .art-body table {
     display: block;
