@@ -7,8 +7,8 @@
   width: var(--right-w);
   flex-shrink: 0;
   /* 关键: 不设 overflow/padding，由 outline-inner 承载 */
-  /* 慢一点: 480ms */
-  transition: width 480ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* 与左侧 Sidebar 完全同步的动画曲线 */
+  transition: width 280ms cubic-bezier(0.4, 0, 0.2, 1);
   will-change: width;
 }
 .outline-inner {
@@ -20,10 +20,9 @@
   padding: 22px 22px 24px;
   overflow-y: auto;
   overflow-x: hidden;
-  /* 内容左滑淡出: 380ms, 比 width 略快, 显得层次更自然 */
-  transition:
-    opacity 380ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform 380ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* 与左侧 sidebar-inner 完全一致的曲线 */
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 220ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .outline.empty {
   color: var(--text-3);

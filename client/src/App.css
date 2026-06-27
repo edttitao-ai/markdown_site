@@ -249,6 +249,8 @@
 }
 .app-outline-toggle.collapsed {
   color: var(--text-3);
+  background: transparent;
+  border-color: var(--border);
 }
 .app-outline-toggle.open {
   background: var(--primary);
