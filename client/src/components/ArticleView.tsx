@@ -8,9 +8,7 @@ interface Props {
   category: string;
   id: string;
   isMobile: boolean;
-  outlineOpen: boolean;
-  onToggleOutline: () => void;
-  onCloseOutline: () => void;
+  outlineVisible: boolean;
   onEdit: () => void;
   onDeleted: () => void;
 }
@@ -19,9 +17,7 @@ export default function ArticleView({
   category,
   id,
   isMobile,
-  outlineOpen,
-  onToggleOutline,
-  onCloseOutline,
+  outlineVisible,
   onEdit,
   onDeleted,
 }: Props) {
@@ -61,7 +57,7 @@ export default function ArticleView({
   const m = data.meta;
 
   return (
-    <div className="art-wrap">
+    <div className={'art-wrap' + (isMobile && outlineVisible ? ' mobile-outline-open' : '')}>
       <main className="article">
         <header className="art-head">
           <div className="art-eyebrow">
@@ -80,16 +76,6 @@ export default function ArticleView({
             </span>
           </div>
           <div className="art-actions">
-            {isMobile && outline.length > 0 && (
-              <button
-                className="btn art-outline-toggle"
-                onClick={onToggleOutline}
-                aria-label={outlineOpen ? '关闭大纲' : '打开大纲'}
-                aria-expanded={outlineOpen}
-              >
-                ☰ 大纲
-              </button>
-            )}
             <button className="btn" onClick={onEdit}>
               ✎ 编辑
             </button>
@@ -107,13 +93,9 @@ export default function ArticleView({
         </footer>
       </main>
 
-      {/* 桌面端始终显示 Outline;移动端按 outlineOpen 抽屉式显示 */}
-      {(isMobile ? outlineOpen : true) && (
-        <Outline
-          items={outline}
-          isMobile={isMobile}
-          onItemClick={isMobile ? onCloseOutline : undefined}
-        />
+      {/* 桌面端按 outlineVisible 显示/隐藏 Outline;移动端由 outlineVisible 控制抽屉式显示 */}
+      {outlineVisible && (
+        <Outline items={outline} isMobile={isMobile} />
       )}
     </div>
   );

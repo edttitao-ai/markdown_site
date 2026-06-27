@@ -13,19 +13,20 @@ type Mode =
   | { kind: 'welcome' };
 
 const SIDEBAR_COLLAPSED_KEY = 'side.collapsed';
+const OUTLINE_COLLAPSED_KEY = 'outline.collapsed';
 const MOBILE_BREAKPOINT = 768;
 
-function readSidebarCollapsed(): boolean {
+function readBoolLS(key: string): boolean {
   try {
-    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1';
+    return localStorage.getItem(key) === '1';
   } catch {
     return false;
   }
 }
 
-function writeSidebarCollapsed(v: boolean) {
+function writeBoolLS(key: string, v: boolean) {
   try {
-    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, v ? '1' : '0');
+    localStorage.setItem(key, v ? '1' : '0');
   } catch {
     /* ignore */
   }
@@ -47,7 +48,8 @@ export default function App() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [serverOk, setServerOk] = useState<boolean | null>(null);
   const isMobile = useIsMobile();
-  const [sideCollapsed, setSideCollapsed] = useState<boolean>(() => readSidebarCollapsed());
+  const [sideCollapsed, setSideCollapsed] = useState<boolean>(() => readBoolLS(SIDEBAR_COLLAPSED_KEY));
+  const [outlineCollapsed, setOutlineCollapsed] = useState<boolean>(() => readBoolLS(OUTLINE_COLLAPSED_KEY));
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [outlineDrawerOpen, setOutlineDrawerOpen] = useState<boolean>(false);
 
@@ -58,17 +60,26 @@ export default function App() {
     } else {
       setSideCollapsed((prev) => {
         const next = !prev;
-        writeSidebarCollapsed(next);
+        writeBoolLS(SIDEBAR_COLLAPSED_KEY, next);
+        return next;
+      });
+    }
+  }, [isMobile]);
+
+  const toggleOutline = useCallback(() => {
+    if (isMobile) {
+      setOutlineDrawerOpen((v) => !v);
+      setDrawerOpen(false);
+    } else {
+      setOutlineCollapsed((prev) => {
+        const next = !prev;
+        writeBoolLS(OUTLINE_COLLAPSED_KEY, next);
         return next;
       });
     }
   }, [isMobile]);
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
-  const toggleOutlineDrawer = useCallback(() => {
-    setOutlineDrawerOpen((v) => !v);
-    setDrawerOpen(false);
-  }, []);
   const closeOutlineDrawer = useCallback(() => setOutlineDrawerOpen(false), []);
 
   useEffect(() => {
@@ -82,17 +93,21 @@ export default function App() {
     })();
   }, []);
 
+  // Ctrl/Cmd + B 切换侧边栏,Ctrl/Cmd + Shift + O 切换大纲(仅桌面端)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
       if (mod && (e.key === 'b' || e.key === 'B')) {
         e.preventDefault();
         if (!isMobile) toggleSide();
+      } else if (mod && e.shiftKey && (e.key === 'o' || e.key === 'O')) {
+        e.preventDefault();
+        if (!isMobile) toggleOutline();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [toggleSide, isMobile]);
+  }, [toggleSide, toggleOutline, isMobile]);
 
   useEffect(() => {
     if (!isMobile) return;
@@ -119,6 +134,8 @@ export default function App() {
 
   const selectedCategory = mode.kind === 'view' || mode.kind === 'edit' ? mode.category : null;
   const selectedId = mode.kind === 'view' || mode.kind === 'edit' ? mode.id : null;
+
+  const outlineVisible = isMobile ? outlineDrawerOpen : !outlineCollapsed;
 
   return (
     <div className={'app' + (isMobile ? ' mobile' : '')}>
@@ -173,6 +190,39 @@ export default function App() {
           {serverOk === true && (
             <span className="app-status ok">● 后端已连接</span>
           )}
+          <button
+            type="button"
+            className={'app-outline-toggle' + (isMobile ? (outlineDrawerOpen ? ' open' : '') : outlineCollapsed ? ' collapsed' : '')}
+            onClick={toggleOutline}
+            aria-label={
+              isMobile
+                ? outlineDrawerOpen
+                  ? '关闭大纲'
+                  : '打开大纲'
+                : outlineCollapsed
+                ? '展开大纲'
+                : '收起大纲'
+            }
+            title={
+              isMobile
+                ? outlineDrawerOpen
+                  ? '关闭大纲'
+                  : '打开大纲'
+                : outlineCollapsed
+                ? '展开大纲 (Ctrl+Shift+O)'
+                : '收起大纲 (Ctrl+Shift+O)'
+            }
+            aria-expanded={isMobile ? outlineDrawerOpen : !outlineCollapsed}
+          >
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="4" y1="5" x2="16" y2="5" />
+              <line x1="4" y1="10" x2="16" y2="10" />
+              <line x1="4" y1="15" x2="12" y2="15" />
+              <circle cx="2.5" cy="5" r="0.8" fill="currentColor" stroke="none" />
+              <circle cx="2.5" cy="10" r="0.8" fill="currentColor" stroke="none" />
+              <circle cx="2.5" cy="15" r="0.8" fill="currentColor" stroke="none" />
+            </svg>
+          </button>
           <ThemeToggle />
         </div>
       </header>
@@ -233,9 +283,7 @@ export default function App() {
             category={mode.category}
             id={mode.id}
             isMobile={isMobile}
-            outlineOpen={outlineDrawerOpen}
-            onToggleOutline={toggleOutlineDrawer}
-            onCloseOutline={closeOutlineDrawer}
+            outlineVisible={outlineVisible}
             onEdit={() => setMode({ kind: 'edit', category: mode.category, id: mode.id })}
             onDeleted={() => {
               setMode({ kind: 'welcome' });
