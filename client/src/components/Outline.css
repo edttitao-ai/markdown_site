@@ -1,20 +1,43 @@
+/* ============================================================
+   桌面端 — Outline 折叠/展开双层滑动画
+   外层 .outline 控制 width 收缩
+   内层 .outline-inner 控制内容左滑淡出
+   ============================================================ */
 .outline {
   width: var(--right-w);
   flex-shrink: 0;
+  /* 关键: 不设 overflow/padding，由 outline-inner 承载 */
+  /* 慢一点: 480ms */
+  transition: width 480ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: width;
+}
+.outline-inner {
+  /* 与外层同宽，内容在此，overflow 仅管这里 */
+  width: var(--right-w);
+  height: 100%;
   background: var(--bg-side);
   border-left: 1px solid var(--border);
   padding: 22px 22px 24px;
   overflow-y: auto;
-  /* 桌面端折叠/展开平滑动画 */
+  overflow-x: hidden;
+  /* 内容左滑淡出: 380ms, 比 width 略快, 显得层次更自然 */
   transition:
-    width 280ms cubic-bezier(0.4, 0, 0.2, 1),
-    padding 280ms cubic-bezier(0.4, 0, 0.2, 1),
-    border-left-color 280ms cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    opacity 380ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 380ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .outline.empty {
   color: var(--text-3);
 }
+.outline.collapsed {
+  width: 0;
+}
+.outline.collapsed .outline-inner {
+  opacity: 0;
+  transform: translateX(8px);
+  pointer-events: none;
+}
+
+/* 标题区 */
 .outline-eyebrow {
   font-family: var(--font-code);
   font-size: 10.5px;
@@ -35,7 +58,6 @@
   font-style: italic;
   margin-top: 8px;
 }
-
 .outline-list {
   list-style: none;
   margin: 0;
@@ -56,7 +78,6 @@
   font-family: var(--font-display);
   font-variation-settings: 'opsz' 36;
 }
-
 .outline-link {
   flex: 1;
   display: block;
@@ -89,8 +110,6 @@
   color: #fff;
   font-weight: 500;
 }
-
-/* 键盘 focus 可见 */
 .outline-link:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 1px;
@@ -109,10 +128,19 @@
     width: 86vw;
     max-width: 320px;
     z-index: 50;
+    overflow: visible;
+    transition: none;
+  }
+  .outline-inner {
+    width: 100%;
+    height: 100%;
     border-left: 1px solid var(--border);
     box-shadow: 0 8px 24px rgba(28, 27, 26, 0.18);
     padding: 18px 18px 24px;
     animation: outline-drawer-in 240ms cubic-bezier(0.4, 0, 0.2, 1);
+    /* 抽屉模式不需要内层滑动效果 */
+    transform: none !important;
+    opacity: 1 !important;
   }
   .outline-mobile-head {
     margin-bottom: 12px;
@@ -120,21 +148,25 @@
     border-bottom: 1px solid var(--border);
   }
   .outline-mobile-head .outline-title { margin-bottom: 0; }
-  .outline.empty { padding: 18px; }
+  .outline.empty .outline-inner { padding: 18px; }
   .outline-link {
     padding: 10px 12px;
     font-size: 14px;
-    /* 手指触达 */
     min-height: 44px;
     display: flex;
     align-items: center;
   }
   .outline-item.level-1 .outline-link { font-size: 14.5px; }
+  .outline.collapsed { width: 0; }
 }
 @keyframes outline-drawer-in {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .outline { animation: none; }
+  .outline { animation: none; transition-duration: 0.01ms !important; }
+  .outline-inner { animation: none; transition-duration: 0.01ms !important; }
+  .outline.collapsed .outline-inner {
+    opacity: 1; transform: none; pointer-events: auto;
+  }
 }
