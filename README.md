@@ -9,7 +9,7 @@
 - **配色**：米黄纸张底 `#f4f1ea` + 朱砂红 `#a8321e` + 墨黑
 - **字体**：Fraunces（衬线标题）+ IBM Plex Sans（正文）+ JetBrains Mono（数字）
 - **圆角**：6px（克制，不浮夸）
-- **阴影**：极轻，只在 hover 出现
+- **阴影**：极轻，只在 hover 出现。
 
 ## 目录结构
 
@@ -84,11 +84,12 @@ npm run dev
 
 本项目**前后端都在 Node.js 运行时执行**，不是传统的前后端分离部署：
 
-| 组件 | 本地开发 | 生产部署 |
-| --- | --- | --- |
-| 前端 UI | Vite :5173 | 同进程，由 Express 托管 |
-| 后端 API | Express :3001 | **必须**独立运行（读写 articles/） |
-| 依赖 | `node_modules/` | **必须**完整上传或重新 `npm install` |
+
+| 组件     | 本地开发        | 生产部署                             |
+| -------- | --------------- | ------------------------------------ |
+| 前端 UI  | Vite :5173      | 同进程，由 Express 托管              |
+| 后端 API | Express :3001   | **必须**独立运行（读写 articles/）   |
+| 依赖     | `node_modules/` | **必须**完整上传或重新 `npm install` |
 
 这不是纯静态网站——后端 `server/index.js` 在运行时**动态读取 `articles/` 目录的 `.md` 文件**、解析 frontmatter、转为 HTML 返回给前端。所以服务器必须装 Node.js + 完整 `node_modules`。
 
@@ -96,17 +97,21 @@ npm run dev
 
 1. 把项目整个压缩包上传到服务器网站目录（如 `/www/wwwroot/markdown/`）
 2. 在面板终端进入该目录：
+
    ```bash
    cd /www/wwwroot/markdown
    npm install
    ```
 3. 运行后端（保持后台运行，用 `screen` / `pm2` / `systemd`）：
+
    ```bash
    screen -S server
    node server/index.js
    # 按 Ctrl+A D 退出 screen，后端继续在后台运行
    ```
+
    或用 pm2：
+
    ```bash
    npm install -g pm2
    pm2 start server/index.js --name markdown-api
@@ -133,7 +138,6 @@ npm run dev
        }
    }
    ```
-
 5. 重载 Nginx：`nginx -s reload`
 
 ### 方式二：Docker 部署
@@ -167,10 +171,11 @@ npm run build       # 生成 dist/ 目录
 
 ## 端口说明
 
-| 端口 | 服务 | 说明 |
-| --- | --- | --- |
-| 5173 | Vite (前端) | 仅本地开发使用 |
-| 3001 | Express (后端) | 读写 .md 文件，前端通过 `/api/...` 调用 |
+
+| 端口 | 服务           | 说明                                   |
+| ---- | -------------- | -------------------------------------- |
+| 5173 | Vite (前端)    | 仅本地开发使用                         |
+| 3001 | Express (后端) | 读写 .md 文件，前端通过`/api/...` 调用 |
 
 ## 功能清单
 
@@ -186,15 +191,16 @@ npm run build       # 生成 dist/ 目录
 
 ## API 路由
 
-| 方法 | 路径 | 用途 |
-| --- | --- | --- |
-| GET | `/api/health` | 健康检查 |
-| GET | `/api/categories` | 列出分类 + 文章数 |
-| GET | `/api/articles?category=Redis` | 列某分类下文章 |
-| GET | `/api/article?category=Redis&id=xxx` | 读单篇（返回 HTML） |
-| GET | `/api/raw?category=Redis&id=xxx` | 读单篇原始 .md（编辑器预填） |
-| POST | `/api/article` | 新建/覆盖（body 含 category/title/tags/body） |
-| DELETE | `/api/article?category=Redis&id=xxx` | 删除 |
+
+| 方法   | 路径                                 | 用途                                          |
+| ------ | ------------------------------------ | --------------------------------------------- |
+| GET    | `/api/health`                        | 健康检查                                      |
+| GET    | `/api/categories`                    | 列出分类 + 文章数                             |
+| GET    | `/api/articles?category=Redis`       | 列某分类下文章                                |
+| GET    | `/api/article?category=Redis&id=xxx` | 读单篇（返回 HTML）                           |
+| GET    | `/api/raw?category=Redis&id=xxx`     | 读单篇原始 .md（编辑器预填）                  |
+| POST   | `/api/article`                       | 新建/覆盖（body 含 category/title/tags/body） |
+| DELETE | `/api/article?category=Redis&id=xxx` | 删除                                          |
 
 ## 常见问题
 
